@@ -15,7 +15,6 @@ async function main() {
     try {
         price = await getPrice();
 
-        console.log(price);
         if (price?.url) {
             await connectToChannel();
 
@@ -27,15 +26,15 @@ async function main() {
 
             // ======================================================
             const page = await browser.newPage();
-            await page.setRequestInterception(true);
+            // await page.setRequestInterception(true);
 
-            page.on('request', (req) => {
-                if (['image', 'stylesheet', 'font'].includes(req.resourceType())) {
-                    req.abort();
-                } else {
-                    req.continue();
-                }
-            });
+            // page.on('request', (req) => {
+            //     if (['image', 'stylesheet', 'font'].includes(req.resourceType())) {
+            //         req.abort();
+            //     } else {
+            //         req.continue();
+            //     }
+            // });
 
             // page.on('request', (request) => {
             //     if (request.resourceType() === 'image') {

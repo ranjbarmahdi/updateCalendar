@@ -10,11 +10,11 @@ export default async function otaghak(page, priceRow) {
         // Go To Url
         await page.goto(priceRow.url, { timeout: 180000 });
 
-        await page.evaluate(() => {
-            document.body.querySelectorAll('*').forEach((el) => {
-                if (!el.matches('.Calendar_container__AQwuE > div')) el.style.display = 'none';
-            });
-        });
+        // await page.evaluate(() => {
+        //     document.body.querySelectorAll('*').forEach((el) => {
+        //         if (!el.matches('.Calendar_container__AQwuE > div')) el.style.display = 'none';
+        //     });
+        // });
 
         // await delay(2000);
 
