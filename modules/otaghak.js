@@ -9,14 +9,22 @@ export default async function otaghak(page, priceRow) {
 
         // Go To Url
         await page.goto(priceRow.url, { timeout: 180000 });
-
-        // await page.evaluate(() => {
-        //     document.body.querySelectorAll('*').forEach((el) => {
-        //         if (!el.matches('.Calendar_container__AQwuE > div')) el.style.display = 'none';
-        //     });
-        // });
-
         // await delay(2000);
+
+        try {
+            await page.waitForSelector('#your-selector', { timeout: 50000 });
+            console.log('Selector found!');
+        } catch (error) {
+            console.error('Selector not found or an error occurred:', error);
+        }
+
+        await page.evaluate(() => {
+            document.body.querySelectorAll('*').forEach((el) => {
+                if (!el.matches('.Calendar_container__AQwuE > div')) el.style.display = 'none';
+            });
+        });
+
+        console.log('Hello Mehdi');
 
         let html = await page.content();
         let $ = cheerio.load(html);
@@ -59,16 +67,6 @@ export default async function otaghak(page, priceRow) {
                     const scrapedAt = new Date();
                     const AccomodationId = priceRow.AccomodationId;
                     const HostId = priceRow.HostId;
-
-                    console.log({
-                        date,
-                        price,
-                        available,
-                        isInstant,
-                        scrapedAt,
-                        AccomodationId,
-                        HostId,
-                    });
 
                     calendar.push({
                         date,
