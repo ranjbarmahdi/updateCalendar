@@ -12,7 +12,7 @@ export default async function otaghak(page, priceRow) {
         // await delay(2000);
 
         try {
-            await page.waitForSelector('.Calendar_container__AQwuE > div', { timeout: 1000 });
+            await page.waitForSelector('.Calendar_container__AQwuE > div', { timeout: 5000 });
             console.log('Selector found!');
         } catch (error) {
             console.error('Selector not found or an error occurred:', error);
