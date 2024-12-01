@@ -11,12 +11,12 @@ export default async function otaghak(page, priceRow) {
         await page.goto(priceRow.url, { timeout: 180000 });
         // await delay(2000);
 
-        // try {
-        //     await page.waitForSelector('#your-selector', { timeout: 5000 });
-        //     console.log('Selector found!');
-        // } catch (error) {
-        //     console.error('Selector not found or an error occurred:', error);
-        // }
+        try {
+            await page.waitForSelector('.Calendar_container__AQwuE > div', { timeout: 1000 });
+            console.log('Selector found!');
+        } catch (error) {
+            console.error('Selector not found or an error occurred:', error);
+        }
 
         await page.evaluate(() => {
             document.body.querySelectorAll('*').forEach((el) => {
