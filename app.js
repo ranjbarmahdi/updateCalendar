@@ -78,6 +78,8 @@ async function main() {
 
         if (page) await page.close();
         if (browser) await browser.close();
+
+        process.exit(0);
     }
 }
 
