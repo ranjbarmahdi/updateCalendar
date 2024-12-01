@@ -15,6 +15,7 @@ async function main() {
     try {
         price = await getPrice();
 
+        console.log(price);
         if (price?.url) {
             await connectToChannel();
 
