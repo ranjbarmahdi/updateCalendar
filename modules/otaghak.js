@@ -40,6 +40,7 @@ export default async function otaghak(page, priceRow) {
                             ?.replace(/[^\u06F0-\u06F90-9]/g, '')
                             ?.trim()
                     );
+
                     if (price) {
                         price *= 1000;
                     }
@@ -58,6 +59,16 @@ export default async function otaghak(page, priceRow) {
                     const scrapedAt = new Date();
                     const AccomodationId = priceRow.AccomodationId;
                     const HostId = priceRow.HostId;
+
+                    console.log({
+                        date,
+                        price,
+                        available,
+                        isInstant,
+                        scrapedAt,
+                        AccomodationId,
+                        HostId,
+                    });
 
                     calendar.push({
                         date,
