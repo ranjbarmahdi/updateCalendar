@@ -1,4 +1,11 @@
-import { getBrowser, getRandomElement, delay, checkMemoryCpu, getDomain } from './utils.js';
+import {
+    getBrowser,
+    getRandomElement,
+    delay,
+    checkMemoryCpu,
+    getDomain,
+    getPage,
+} from './utils.js';
 import { DOMAINS } from './modules/enums.js';
 import otaghak from './modules/otaghak.js';
 import { getPrice } from './db.js';
@@ -6,79 +13,48 @@ import connectToChannel, { pushToQueue } from './rabbitMQ.js';
 
 // ============================================ Main
 async function main() {
+    let page;
     let price;
     let browser;
-    let page;
     const QUEUE = 'prices';
 
-    console.time('Execution Time');
     try {
-        price = await getPrice();
+        // Create the browser instance once
+        const proxyList = ['']; // Populate with valid proxies
+        const randomProxy = getRandomElement(proxyList);
+        browser = await getBrowser(randomProxy, true, false);
 
-        if (price?.url) {
+        while ((price = await getPrice()) !== null) {
+            console.time('Execution Time');
             await connectToChannel();
 
-            const proxyList = [''];
-            const randomProxy = getRandomElement(proxyList);
+            if (price?.url) {
+                // Create a new page for each price
+                page = await getPage(browser);
+                const domain = getDomain(price.url);
 
-            // await delay(Math.random() * 4000);
-            browser = await getBrowser(randomProxy, true, false);
-
-            // ======================================================
-            const page = await browser.newPage();
-            await page.setRequestInterception(true);
-
-            page.on('request', (req) => {
-                if (['image', 'stylesheet', 'font'].includes(req.resourceType())) {
-                    req.abort();
-                } else {
-                    req.continue();
+                let calendar = [];
+                switch (domain) {
+                    case DOMAINS.OTAGHAK:
+                        calendar = await otaghak(page, price);
+                        break;
+                    default:
+                        console.log('Not Found Domain:', domain);
+                        break;
                 }
-            });
 
-            // page.on('request', (request) => {
-            //     if (request.resourceType() === 'image') {
-            //         console.log('Blocking image request: ' + request.url());
-            //         request.abort();
-            //     } else {
-            //         request.continue();
-            //     }
-            // });
+                // Push the result to the queue
+                await pushToQueue(QUEUE, calendar);
 
-            // ======================================================
-
-            // const context = await browser.createIncognitoBrowserContext();
-            // page = await context.newPage();
-
-            // await page.evaluateOnNewDocument(() => {
-            //     window.Notification.requestPermission = () => Promise.resolve('denied');
-            // });
-
-            await page.setViewport({ width: 1440, height: 810 });
-
-            const domain = getDomain(price.url);
-
-            let calendar = [];
-            switch (domain) {
-                case DOMAINS.OTAGHAK:
-                    calendar = await otaghak(page, price);
-                    break;
-                default:
-                    console.log('Not Found Domain:', domain);
-                    break;
+                // Close the page after processing
+                await page.close();
+                console.timeEnd('Execution Time');
             }
-
-            await pushToQueue(QUEUE, calendar);
         }
     } catch (error) {
         console.error('Error in main function:', error);
-    } finally {
-        console.timeEnd('Execution Time');
-        console.log('End');
-
         if (page) await page.close();
         if (browser) await browser.close();
-
         process.exit(0);
     }
 }

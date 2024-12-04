@@ -209,6 +209,42 @@ export const getBrowser = async (proxyServer, headless = true, withProxy = true)
     }
 };
 
+// ============================================ getPage
+export const getPage = async (browser) => {
+    const page = await browser.newPage();
+    await page.setRequestInterception(true);
+
+    page.on('request', (req) => {
+        if (['image', 'stylesheet', 'font'].includes(req.resourceType())) {
+            req.abort();
+        } else {
+            req.continue();
+        }
+    });
+
+    // page.on('request', (request) => {
+    //     if (request.resourceType() === 'image') {
+    //         console.log('Blocking image request: ' + request.url());
+    //         request.abort();
+    //     } else {
+    //         request.continue();
+    //     }
+    // });
+
+    // ======================================================
+
+    // const context = await browser.createIncognitoBrowserContext();
+    // page = await context.newPage();
+
+    // await page.evaluateOnNewDocument(() => {
+    //     window.Notification.requestPermission = () => Promise.resolve('denied');
+    // });
+
+    await page.setViewport({ width: 1440, height: 810 });
+
+    return page;
+};
+
 // ============================================ delay
 export const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
